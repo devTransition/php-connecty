@@ -1,5 +1,5 @@
 {
-    "name": "devTransition/Connecty",
+    "name": "dev-transition/connecty",
     "description": "Connecty gateway library",
     "type": "library",
     "require": {
