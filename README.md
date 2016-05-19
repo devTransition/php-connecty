@@ -14,7 +14,7 @@ PHP Gateway for different API clients
 Via Composer
 
 ``` bash
-$ composer require dev-transition/connecty
+$ composer require devtransition/connecty
 ```
 
 ## Usage
