@@ -14,7 +14,7 @@ PHP Gateway for different API clients
 Via Composer
 
 ``` bash
-$ composer require devTransitions/Connecty
+$ composer require devTransition/Connecty
 ```
 
 ## Usage
@@ -60,12 +60,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 
-[ico-version]: https://img.shields.io/packagist/v/devTransitions/Connecty.svg?style=flat-square
+[ico-version]: https://img.shields.io/packagist/v/devTransition/Connecty.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-Apache-brightgreen.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/devTransitions/Connecty/master.svg?style=flat-square
-[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/devTransitions/Connecty.svg?style=flat-square
-[ico-code-quality]: https://img.shields.io/scrutinizer/g/devTransitions/Connecty.svg?style=flat-square
-[ico-downloads]: https://img.shields.io/packagist/dt/devTransitions/Connecty.svg?style=flat-square
+[ico-travis]: https://img.shields.io/travis/devTransition/Connecty/master.svg?style=flat-square
+[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/devTransition/Connecty.svg?style=flat-square
+[ico-code-quality]: https://img.shields.io/scrutinizer/g/devTransition/Connecty.svg?style=flat-square
+[ico-downloads]: https://img.shields.io/packagist/dt/devTransition/Connecty.svg?style=flat-square
 
 [link-packagist]: https://packagist.org/packages/devtransition/connecty
 [link-travis]: https://travis-ci.org/devTransition/connecty
