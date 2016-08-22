@@ -84,57 +84,6 @@ class Helper
     }
 
     /**
-     * Resolve a gateway class to alias
-     *
-     * The short name can be used with GatewayFactory as an alias of the gateway class,
-     * to create new instances of a gateway
-     *
-     * @param string $class_name
-     * @return string $alias
-     */
-    public static function getGatewayAlias($class_name)
-    {
-        // remove leading backslash from class name
-        if (strpos($class_name, '\\') === 0) {
-            $class_name = substr($class_name, 1);
-        }
-
-        if (strpos($class_name, 'Connecty\\') === 0) {
-            return trim(str_replace('\\', '_', substr($class_name, 9, -7)), '_');
-        }
-
-        return '\\' . $class_name;
-    }
-
-    /**
-     * Resolve a gateway alias to a full namespaced gateway class
-     *
-     * Class names beginning with a namespace marker (\) are left intact.
-     * Non-namespaced classes are expected to be in the \Connecty namespace,
-     *
-     *      \Custom\Gateway     => \Custom\Gateway
-     *      \Custom_Gateway     => \Custom_Gateway
-     *      Tokenizer           => \Connecty\Tokenizer\Gateway
-     *
-     * @param string $alias of the gateway
-     * @return string $ret The fully namespaced gateway class name
-     */
-    public static function getGatewayClassName($alias)
-    {
-        if (strpos($alias, '\\') === 0) {
-            return $alias;
-        }
-
-        // replace underscores with namespace marker, PSR-0 style
-        $alias = str_replace('_', '\\', $alias);
-        if (strpos($alias, '\\') === false) {
-            $alias .= '\\';
-        }
-
-        return '\\Connecty\\' . $alias . 'Gateway';
-    }
-
-    /**
      * Convert an amount into a float
      *
      * @var string|int|float $value

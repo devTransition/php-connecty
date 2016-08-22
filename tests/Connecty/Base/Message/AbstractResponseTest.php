@@ -31,7 +31,6 @@ class AbstractResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaultMethods()
     {
-        $this->assertNull($this->response->getCode());
         $this->assertNull($this->response->getRequest());
         $this->assertNull($this->response->getResponseData());
     }

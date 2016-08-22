@@ -58,16 +58,6 @@ abstract class AbstractResponse implements ResponseInterface
     }
 
     /**
-     * Get return code for response
-     *
-     * @return int
-     */
-    public function getCode()
-    {
-        return null;
-    }
-
-    /**
      * Get the response data
      *
      * @return mixed

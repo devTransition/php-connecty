@@ -18,11 +18,4 @@ interface ResponseInterface
      * @return RequestInterface
      */
     public function getRequest();
-
-    /**
-     * Response code
-     *
-     * @return string A response code from the gateway
-     */
-    public function getCode();
 }

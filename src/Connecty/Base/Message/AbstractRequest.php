@@ -5,7 +5,6 @@
 
 namespace Connecty\Base\Message;
 
-use Connecty\Exception\ConnectyException;
 use GuzzleHttp\Client;
 use Connecty\Exception\RuntimeException;
 use Connecty\Base\Helper;
@@ -15,7 +14,7 @@ use Connecty\Base\Helper;
  *
  * This class defines a set of functions for all Connecty requests
  *
- * Requests are usually created using the createRequest function of the Connecty gateway and then actioned using methods inside class that extends this class
+ * Requests are usually created by calling createRequestName function on Connecty subclass
  *
  * Requests are model classes to model request bodies for different API endpoints
  * Public properties of Request are considered as request_data that should be inside request body when request is sent
@@ -25,24 +24,24 @@ use Connecty\Base\Helper;
  * <code>
  *   class MyRequest extends \Connecty\Message\AbstractRequest {};
  *
- *   class MyGateway extends \Connecty\AbstractGateway {
+ *   class MyClient extends \Connecty\Connecty {
  *     function myRequest($params) {
- *       $this->createRequest('MyRequest', $params);
+ *       return new MyRequest($params);
  *     }
  *   }
  *
- *   // Create the gateway object
- *   $gw = Connecty::create('MyGateway');
+ *   $config = [];
+ *   // Create the connecty subclass
+ *   $client = new MyClient($config);
  *
  *   // Create the request object
- *   $my_request = $gw->myRequest($request_params);
+ *   $my_request = $client->myRequest($request_params);
  * </code>
  *
  * Example -- validating and sending a request:
  *
  * <code>
  *   try {
- *     $my_request->validate();
  *     $response = $my_request->send();
  *   } catch (InvalidRequestException $e) {
  *     print "Something went wrong: " . $e->getMessage() . "\n";
@@ -114,7 +113,7 @@ abstract class AbstractRequest implements RequestInterface
     public function initialize($request_data = [])
     {
         if (null !== $this->response) {
-            throw new RuntimeException('Request cannot be modified after it has been sent!');
+            throw new RuntimeException('Request cannot be modified after it has been sent');
         }
 
         Helper::initialize($this, $request_data);
@@ -194,7 +193,7 @@ abstract class AbstractRequest implements RequestInterface
     public function getResponse()
     {
         if ($this->response === null) {
-            throw new RuntimeException('You must call send() before accessing the Response!');
+            throw new RuntimeException('You must call send() before accessing the Response');
         }
 
         return $this->response;

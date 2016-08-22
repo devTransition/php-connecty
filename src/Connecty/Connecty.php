@@ -2,85 +2,134 @@
 
 namespace Connecty;
 
-
-use Connecty\Base\GatewayFactory;
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use Psr\Log\LoggerInterface;
+use Connecty\Base\Storage\StorageInterface;
+use Connecty\Base\Helper;
+use Connecty\Base\Log\Logger;
+use Connecty\Base\Log\GuzzleLogger;
+use Connecty\Base\Storage\MemoryStorage;
 
 /**
- * The main Connecty class provides static access to the gateway factory methods
+ * The base Connecty class that defines constructor parameters for subclasses
  *
- * Example:
- *
- * <code>
- *   // Create a gateway for the Tokenizer
- *   // (routes to GatewayFactory::create)
- *   $tokenizer = Connecty::create('Tokenizer');
- *
- *   // Initialise the gateway
- *   $tokenizer->initialize(...);
- *
- *   // Do an authorisation transaction on the gateway
- *   $tokenizer->authorize(...);
- * </code>
- *
- * @see Connecty\Base\GatewayFactory
  */
 class Connecty
 {
     /**
-     * Private factory object, that provides methods
-     *
-     * @var GatewayFactory
+     * Constants definition
      */
-    private static $factory;
+    const PRODUCTION_MODE = 0;
+    const TEST_MODE = 1;
+    const SIMULATE_MODE = 2;
 
     /**
-     * Factory getter
-     *
-     * Creates a new empty factory object if not set
-     *
-     * @return GatewayFactory $factory
+     * @var \GuzzleHttp\Client
      */
-    public static function getFactory()
+    protected $http_client;
+
+    /**
+     * Configuration
+     * @var array
+     */
+    protected $config;
+
+    /**
+     * Logger used for logging
+     * @var \Psr\Log\LoggerInterface
+     */
+    public $logger;
+
+    /**
+     * Storage used to store authorization and caching
+     * @var StorageInterface
+     */
+    public $storage;
+
+    /**
+     * Test mode integer
+     * @var int
+     */
+    private $test_mode;
+
+    /**
+     * Constructor
+     *
+     * @param array $config
+     * @param \GuzzleHttp\Client $http_client - A Guzzle client to make API calls with
+     * @param LoggerInterface $logger - the logger that will be used for gateway
+     * @param StorageInterface $storage - special cache for storing variables for gateway
+     */
+    public function __construct($config = [], Client $http_client = null, LoggerInterface $logger = null, StorageInterface $storage = null)
     {
-        if (static::$factory === null) {
-            static::$factory = new GatewayFactory();
+        $this->config = $config;
+
+        $this->http_client = $http_client ?: $this->getDefaultHttpClient();
+
+        // initialize default logger with logging disabled if not provided
+        $this->logger = $logger !== null ? $logger : new Logger(null, false);
+
+        // initialize empty memory storage if storage is not provided
+        $this->storage = $storage !== null ? $storage : new MemoryStorage();
+
+        $this->test_mode = self::PRODUCTION_MODE;
+        if (!empty($config['test_mode'])) {
+            $this->setTestMode($config['test_mode']);
         }
-        return static::$factory;
+
+        Helper::initialize($this, $config);
     }
 
     /**
-     * Factory setter
-     *
-     * @param GatewayFactory $factory A GatewayFactory instance
+     * Test mode getter
+     * @return int
      */
-    public static function setFactory(GatewayFactory $factory = null)
+    public function getTestMode()
     {
-        static::$factory = $factory;
+        return $this->test_mode;
     }
 
     /**
-     * Static function call router
-     *
-     * All other function calls to the Connecty class are routed to the factory
-     * e.g. Connecty::getSupportedGateways(1, 2, 'test') is routed to the
-     * factory's getSupportedGateways method and passed the parameters 1, 2, 'test'
-     *
-     * Example:
-     *
-     * <code>
-     *   // Create a gateway for Tokenizer
-     *   $tokenizer = Connecty::create('Tokenizer');
-     * </code>
-     *
-     * @see GatewayFactory
-     *
-     * @param string $method - the factory method to call
-     * @param array $params - method parameters
-     * @return mixed
+     * Test mode setter
+     * @param int $value
      */
-    public static function __callStatic($method, $params)
+    public function setTestMode($value)
     {
-        $factory = static::getFactory();
-        return call_user_func_array([$factory, $method], $params);
+        $this->test_mode = $value;
     }
+
+    /**
+     * Initialize this gateway with array parameters
+     *
+     * (this method expects that gateway class has defined setters for parameters)
+     *
+     * @param array $params
+     * @return $this
+     */
+    public function initialize($params = [])
+    {
+        Helper::initialize($this, $params);
+        return $this;
+    }
+
+    /**
+     * Get the global default HTTP client
+     *
+     * @return Client
+     */
+    protected function getDefaultHttpClient()
+    {
+        $stack = HandlerStack::create();
+        $options = ['handler' => $stack, 'auth' => null];
+
+        if (isset($this->config['debug']) && $this->config['debug'] === true) {
+            $options['debug'] = true;
+            // Add HTTP-Requests to log
+            $stack->push(new GuzzleLogger($this->logger));
+        }
+
+        return new Client($options);
+    }
+
 }

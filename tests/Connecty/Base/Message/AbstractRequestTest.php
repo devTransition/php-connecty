@@ -47,7 +47,7 @@ class AbstractRequestTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Connecty\Exception\RuntimeException
-     * @expectedExceptionMessage Request cannot be modified after it has been sent!
+     * @expectedExceptionMessage Request cannot be modified after it has been sent
      */
     public function testInitializeAfterRequestSent()
     {
@@ -89,7 +89,7 @@ class AbstractRequestTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Connecty\Exception\RuntimeException
-     * @expectedExceptionMessage Request Mockery_2_Connecty_Base_Message_AbstractRequestTest_MockAbstractRequest is not valid
+     * @expectedExceptionMessage Request Mockery_0_Connecty_Base_Message_AbstractRequestTest_MockAbstractRequest is not valid
      */
     public function testSend()
     {
@@ -102,7 +102,7 @@ class AbstractRequestTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Connecty\Exception\RuntimeException
-     * @expectedExceptionMessage You must call send() before accessing the Response!
+     * @expectedExceptionMessage You must call send() before accessing the Response
      */
     public function testGetResponseBeforeRequestSent()
     {
