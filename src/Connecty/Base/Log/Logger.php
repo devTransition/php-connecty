@@ -49,7 +49,7 @@ class Logger implements LoggerInterface
      * @param array $context
      * @return null
      */
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, array $context = [])
     {
         if (!$this->enabled) {
             return;
@@ -63,6 +63,8 @@ class Logger implements LoggerInterface
         } else {
             echo "[{$level}] {$message}\n";
         }
+
+        return null;
     }
 
     /**
@@ -75,21 +77,55 @@ class Logger implements LoggerInterface
         $this->enabled = $value;
     }
 
+    /**
+     * Exceptional occurrences that are not errors.
+     *
+     * Example: Use of deprecated APIs, poor use of an API, undesirable things
+     * that are not necessarily wrong.
+     *
+     * @param LoggerInterface $logger
+     * @param string $message
+     * @param \Exception $exception
+     */
     public static function logWarn(LoggerInterface $logger, $message, \Exception $exception = null)
     {
         self::doLog(LogLevel::WARNING, $logger, $message, $exception);
     }
 
+    /**
+     * Runtime errors that do not require immediate action but should typically
+     * be logged and monitored.
+     *
+     * @param LoggerInterface $logger
+     * @param string $message
+     * @param \Exception $exception
+     */
     public static function logError(LoggerInterface $logger, $message, \Exception $exception = null)
     {
         self::doLog(LogLevel::ERROR, $logger, $message, $exception);
     }
 
+    /**
+     * Interesting events.
+     *
+     * Example: User logs in, SQL logs.
+     *
+     * @param LoggerInterface $logger
+     * @param string $message
+     * @param \Exception $exception
+     */
     public static function logInfo(LoggerInterface $logger, $message, \Exception $exception = null)
     {
         self::doLog(LogLevel::INFO, $logger, $message, $exception);
     }
 
+    /**
+     * Detailed debug information.
+     *
+     * @param LoggerInterface $logger
+     * @param string $message
+     * @param \Exception $exception
+     */
     public static function logDebug(LoggerInterface $logger, $message, \Exception $exception = null)
     {
         self::doLog(LogLevel::DEBUG, $logger, $message, $exception);
@@ -129,7 +165,7 @@ class Logger implements LoggerInterface
 
         foreach ($context as $key => $val) {
             $placeholder = '{' . $key . '}';
-            if ($key === 'exception' && is_a($val, \Exception::class)) {
+            if ($key === 'exception' && is_a($val, '\Exception')) {
                 if (strpos($message, $placeholder) == false) {
                     $message .= "\n" . strval($val);
                 } else {

@@ -88,7 +88,7 @@ class AbstractRequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Connecty\Exception\RuntimeException
+     * @expectedException \Connecty\Exception\InvalidArgumentException
      * @expectedExceptionMessage Request Mockery_0_Connecty_Base_Message_AbstractRequestTest_MockAbstractRequest is not valid
      */
     public function testSend()

@@ -46,12 +46,4 @@ interface RequestInterface
      * @return ResponseInterface
      */
     public function send();
-
-    /**
-     * Send the request with specified data
-     *
-     * @param mixed $request_data The request data to send (body of request)
-     * @return ResponseInterface
-     */
-    public function sendRequest($request_data);
 }

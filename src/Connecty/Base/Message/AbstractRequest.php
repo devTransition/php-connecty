@@ -185,6 +185,14 @@ abstract class AbstractRequest implements RequestInterface
     }
 
     /**
+     * Send the request with specified data
+     *
+     * @param mixed $request_data The request data to send (body of request)
+     * @return ResponseInterface
+     */
+    abstract protected function sendRequest($request_data);
+
+    /**
      * Get the associated Response
      *
      * @return ResponseInterface
