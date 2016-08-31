@@ -6,6 +6,7 @@
 namespace Connecty\Base\Message;
 
 use Connecty\Exception\InvalidRequestException;
+use Connecty\Exception\InvalidResponseException;
 use GuzzleHttp\Client;
 use Connecty\Exception\RuntimeException;
 use Connecty\Base\Helper;
@@ -190,6 +191,8 @@ abstract class AbstractRequest implements RequestInterface
      * Send the request with specified data
      *
      * @param array $request_data The request data to send (body of request)
+     * @throws InvalidRequestException On any RequestException of the http client
+     * @throws InvalidResponseException If something is wrong with the response.
      * @return ResponseInterface
      */
     abstract protected function sendRequest(array $request_data);
