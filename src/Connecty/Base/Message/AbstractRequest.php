@@ -5,6 +5,7 @@
 
 namespace Connecty\Base\Message;
 
+use Connecty\Exception\InvalidRequestException;
 use GuzzleHttp\Client;
 use Connecty\Exception\RuntimeException;
 use Connecty\Base\Helper;
@@ -82,7 +83,7 @@ abstract class AbstractRequest implements RequestInterface
      * @param array $request_data
      * @param RequestAttributes $request_attributes
      */
-    public function __construct(Client $http_client, $request_data = [], RequestAttributes $request_attributes = null)
+    public function __construct(Client $http_client, array $request_data = [], RequestAttributes $request_attributes = null)
     {
         $this->http_client = $http_client;
 
@@ -110,7 +111,7 @@ abstract class AbstractRequest implements RequestInterface
      * @return $this
      * @throws RuntimeException
      */
-    public function initialize($request_data = [])
+    public function initialize(array $request_data = [])
     {
         if (null !== $this->response) {
             throw new RuntimeException('Request cannot be modified after it has been sent');
@@ -142,7 +143,8 @@ abstract class AbstractRequest implements RequestInterface
      *
      * Override this method, it is called internally to avoid wasting time with an API call when the request is clearly invalid
      *
-     * @return bool
+     * @throws InvalidRequestException If one mandatory parameter is missing or invalid
+     * @return true If everything is ok.
      */
     public function validate()
     {
@@ -187,10 +189,10 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Send the request with specified data
      *
-     * @param mixed $request_data The request data to send (body of request)
+     * @param array $request_data The request data to send (body of request)
      * @return ResponseInterface
      */
-    abstract protected function sendRequest($request_data);
+    abstract protected function sendRequest(array $request_data);
 
     /**
      * Get the associated Response

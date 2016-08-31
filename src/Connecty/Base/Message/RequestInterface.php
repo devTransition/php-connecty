@@ -17,7 +17,7 @@ interface RequestInterface
      *
      * @param array $params The parameters to send
      */
-    public function initialize($params = []);
+    public function initialize(array $params = []);
 
     /**
      * Get all request parameters

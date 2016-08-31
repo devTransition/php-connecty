@@ -7,7 +7,6 @@ use Connecty\Base\Log\Logger;
 use Connecty\Base\Storage\MemoryStorage;
 use Connecty\Base\Storage\StorageInterface;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Subscriber\Log\Formatter;
 use GuzzleHttp\Subscriber\Log\LogSubscriber;
 use Psr\Log\LoggerInterface;
@@ -94,11 +93,27 @@ class Connecty
             $options['debug'] = true;
 
             // Attach the log channel to the log subscriber of the http client
-            $subscriber = new LogSubscriber($logger, Formatter::DEBUG);     // TODO r.simlinger: make log format changeable
+            $subscriber = new LogSubscriber($logger, $this->getLogFormat());
             $client->getEmitter()->attach($subscriber);
         }
 
         return $client;
+    }
+
+    /**
+     * Returns the log format for the http client logger
+     *
+     * @see https://github.com/guzzle/log-subscriber/blob/master/README.rst
+     *
+     * @return string
+     */
+    private function getLogFormat()
+    {
+        if (!$this->test_mode) {    // production
+            return '[{ts}] "{method} {url}" {code}';
+        }
+
+        return Formatter::DEBUG;
     }
 
     /**
