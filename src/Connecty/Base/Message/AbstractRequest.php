@@ -191,8 +191,9 @@ abstract class AbstractRequest implements RequestInterface
      * Send the request with specified data
      *
      * @param array $request_data The request data to send (body of request)
-     * @throws InvalidRequestException On any RequestException of the http client
-     * @throws InvalidResponseException If something is wrong with the response.
+     * @throws RuntimeException On any RequestException of the http client
+     * @throws InvalidRequestException If one mandatory parameter is missing or invalid
+     * @throws InvalidResponseException If something is wrong with the response
      * @return ResponseInterface
      */
     abstract protected function sendRequest(array $request_data);

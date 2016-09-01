@@ -86,6 +86,10 @@ class Connecty
     {
         $options = [];
 
+        if (isset($this->config['base_url']) && strlen($this->config['base_url']) > 6) {
+            $options['base_url'] = $this->config['base_url'];
+        }
+
         $client = new Client($options);
 
         if (isset($this->config['debug']) && $this->config['debug'] === true) {
