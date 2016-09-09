@@ -23,25 +23,30 @@ class Connecty
     const PRODUCTION_MODE = 0;
     const TEST_MODE = 1;
     const SIMULATE_MODE = 2;
+
     /**
      * Logger used for logging
      * @var \Psr\Log\LoggerInterface
      */
     public $logger;
+
     /**
      * Storage used to store authorization and caching
      * @var StorageInterface
      */
     public $storage;
+
     /**
      * @var \GuzzleHttp\Client
      */
     protected $http_client;
+
     /**
      * Configuration
      * @var array
      */
     protected $config;
+
     /**
      * Test mode integer
      * @var int
@@ -97,11 +102,27 @@ class Connecty
             $options['debug'] = true;
 
             // Attach the log channel to the log subscriber of the http client
-            $subscriber = new LogSubscriber($logger, Formatter::DEBUG);     // TODO r.simlinger: make log format changeable
+            $subscriber = new LogSubscriber($logger, $this->getLogFormat());
             $client->getEmitter()->attach($subscriber);
         }
 
         return $client;
+    }
+
+    /**
+     * Returns the log format for the http client logger
+     *
+     * @see https://github.com/guzzle/log-subscriber/blob/master/README.rst
+     *
+     * @return string
+     */
+    private function getLogFormat()
+    {
+        if (!$this->test_mode) {    // production
+            return '[{ts}] "{method} {url}" {code}';
+        }
+
+        return Formatter::DEBUG;
     }
 
     /**
