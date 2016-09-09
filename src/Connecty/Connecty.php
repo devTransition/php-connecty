@@ -65,6 +65,11 @@ class Connecty
     {
         $this->config = $config;
 
+        $this->test_mode = self::PRODUCTION_MODE;
+        if (!empty($config['test_mode'])) {
+            $this->setTestMode($config['test_mode']);
+        }
+
         // initialize default logger with logging disabled if not provided
         $this->logger = $logger !== null ? $logger : new Logger();
 
@@ -72,11 +77,6 @@ class Connecty
 
         // initialize empty memory storage if storage is not provided
         $this->storage = $storage !== null ? $storage : new MemoryStorage();
-
-        $this->test_mode = self::PRODUCTION_MODE;
-        if (!empty($config['test_mode'])) {
-            $this->setTestMode($config['test_mode']);
-        }
 
         Helper::initialize($this, $config);
     }
