@@ -5,10 +5,12 @@
 
 namespace Connecty;
 
-use Mockery as m;
 use Connecty\Base\Message\AbstractRequest;
 use Connecty\Base\Message\RequestAttributes;
+use Connecty\Base\Model\AbstractModel;
+use Connecty\Base\Model\RequestDataInterface;
 use Connecty\Base\Storage\StorageInterface;
+use Mockery as m;
 use Psr\Log\LoggerInterface;
 
 class ConnectyTest extends \PHPUnit_Framework_TestCase
@@ -77,7 +79,8 @@ class ConnectyTest extends \PHPUnit_Framework_TestCase
     public function testCreateRequest()
     {
         $this->connecty = new ConnectyTest_MockConnecty;
-        $request = $this->connecty->callCreateSampleRequest([]);
+        $params = ConnecyTest_MockAbstractModel::createFromArray([]);
+        $request = $this->connecty->callCreateSampleRequest($params);
         $this->assertNotNull($request->serialize());
     }
 
@@ -107,7 +110,50 @@ class ConnecyTest_MockAbstractRequest extends AbstractRequest
         $this->request_attributes = new RequestAttributes();
     }
 
-    public function sendRequest($request_data)
+    public function sendRequest(RequestDataInterface $request_data)
     {
+    }
+}
+
+class ConnecyTest_MockAbstractModel extends AbstractModel
+{
+    protected $amount;
+
+    protected $currency;
+
+    /**
+     * @return mixed
+     */
+    public function getAmount()
+    {
+        return $this->amount;
+    }
+
+    /**
+     * @param mixed $amount
+     * @return self
+     */
+    public function setAmount($amount)
+    {
+        $this->amount = $amount;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCurrency()
+    {
+        return $this->currency;
+    }
+
+    /**
+     * @param mixed $currency
+     * @return self
+     */
+    public function setCurrency($currency)
+    {
+        $this->currency = $currency;
+        return $this;
     }
 }
