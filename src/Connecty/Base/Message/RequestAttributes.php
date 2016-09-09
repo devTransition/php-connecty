@@ -59,7 +59,7 @@ class RequestAttributes
      * Function to add options to Request parameters
      *
      * @param array $options
-     * @return self
+     * @return static
      */
     public function addOptions($options = [])
     {

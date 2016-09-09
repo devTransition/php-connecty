@@ -113,7 +113,7 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Function that initializes request_attributes for current class
      * @param RequestAttributes $request_attributes
-     * @return self
+     * @return static
      */
     protected function initializeRequestAttributes(RequestAttributes $request_attributes = null)
     {
@@ -128,7 +128,7 @@ abstract class AbstractRequest implements RequestInterface
      *
      * @param RequestDataInterface $request_data An associative array of parameters
      * @throws RuntimeException
-     * @return self
+     * @return static
      */
     public function initializeRequestData(RequestDataInterface $request_data)
     {

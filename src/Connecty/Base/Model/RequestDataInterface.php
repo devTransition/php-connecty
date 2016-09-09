@@ -13,7 +13,7 @@ interface RequestDataInterface
      * Convert the given array into object models
      *
      * @param array $data
-     * @return self
+     * @return static
      */
     public static function createFromArray(array $data);
 
