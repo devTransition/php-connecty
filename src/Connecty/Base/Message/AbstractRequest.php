@@ -5,9 +5,11 @@
 
 namespace Connecty\Base\Message;
 
-use GuzzleHttp\Client;
+use Connecty\Base\Model\RequestDataInterface;
+use Connecty\Exception\InvalidRequestException;
+use Connecty\Exception\InvalidResponseException;
 use Connecty\Exception\RuntimeException;
-use Connecty\Base\Helper;
+use GuzzleHttp\Client;
 
 /**
  * Abstract Request
@@ -55,18 +57,23 @@ use Connecty\Base\Helper;
 abstract class AbstractRequest implements RequestInterface
 {
     /**
-     * The request attributes
-     *
-     * @var RequestAttributes
-     */
-    protected $request_attributes;
-
-    /**
      * The request client
      *
      * @var Client
      */
     protected $http_client;
+
+    /**
+     * @var RequestDataInterface
+     */
+    protected $request_data;
+
+    /**
+     * The request attributes
+     *
+     * @var RequestAttributes
+     */
+    protected $request_attributes;
 
     /**
      * An associated ResponseInterface.
@@ -79,62 +86,59 @@ abstract class AbstractRequest implements RequestInterface
      * Create a new Request
      *
      * @param Client $http_client A Guzzle client to make API calls with
-     * @param array $request_data
+     * @param RequestDataInterface $request_data
      * @param RequestAttributes $request_attributes
      */
-    public function __construct(Client $http_client, $request_data = [], RequestAttributes $request_attributes = null)
+    public function __construct(Client $http_client, RequestDataInterface $request_data = null, RequestAttributes $request_attributes = null)
     {
+        // set up the http client
         $this->http_client = $http_client;
 
-        $this->initialize($request_data);
-
-        if ($request_attributes) {
-            $this->request_attributes = $request_attributes;
-        } else {
-            $this->_initializeRequestAttributes();
+        // set up the (early binding of the) request data
+        if ($request_data) {
+            $this->initializeRequestData($request_data);
         }
+
+        // set up the (optional) given and the default request attributes
+        $this->initializeRequestAttributes($request_attributes);
+    }
+
+    /**
+     * Avoid cloning an instance of this object
+     */
+    private function __clone()
+    {
     }
 
     /**
      * Function that initializes request_attributes for current class
+     * @param RequestAttributes $request_attributes
+     * @return self
      */
-    protected abstract function _initializeRequestAttributes();
+    protected function initializeRequestAttributes(RequestAttributes $request_attributes = null)
+    {
+        $this->request_attributes = $request_attributes ? $request_attributes : new RequestAttributes();
+        return $this;
+    }
 
     /**
      * Initialize the object with parameters.
      *
      * If any unknown parameters passed, they will be ignored.
      *
-     * @param array $request_data An associative array of parameters
-     *
-     * @return $this
+     * @param RequestDataInterface $request_data An associative array of parameters
      * @throws RuntimeException
+     * @return self
      */
-    public function initialize($request_data = [])
+    public function initializeRequestData(RequestDataInterface $request_data)
     {
-        if (null !== $this->response) {
+        if ($this->response) {
             throw new RuntimeException('Request cannot be modified after it has been sent');
         }
 
-        Helper::initialize($this, $request_data);
+        $this->request_data = $request_data;
 
         return $this;
-    }
-
-    /**
-     * Default getParameters function
-     *
-     * @return array
-     */
-    public function getParameters()
-    {
-        $ret = [];
-        $reflect = new \ReflectionObject($this);
-        foreach ($reflect->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
-            $ret[] = $property->getName();
-        }
-
-        return $ret;
     }
 
     /**
@@ -142,31 +146,10 @@ abstract class AbstractRequest implements RequestInterface
      *
      * Override this method, it is called internally to avoid wasting time with an API call when the request is clearly invalid
      *
-     * @return bool
+     * @throws InvalidRequestException If one mandatory parameter is missing or invalid
+     * @return true If everything is ok.
      */
-    public function validate()
-    {
-        return false;
-    }
-
-    /**
-     * Serialize the request_data to a return array
-     *
-     * you can override this method and use some marshaller objects to serialize your request
-     *
-     * @return array $ret
-     */
-    public function serialize()
-    {
-        $ret = [];
-        $reflect = new \ReflectionObject($this);
-        foreach ($reflect->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
-            $property_name = $prop->getName();
-            $ret[$property_name] = $this->$property_name;
-        }
-
-        return $ret;
-    }
+    abstract public function validate();
 
     /**
      * Send the request
@@ -179,16 +162,48 @@ abstract class AbstractRequest implements RequestInterface
         if (!$this->validate()) {
             throw new RuntimeException('Request ' . get_class($this) . ' is not valid');
         }
-        $request_data = $this->serialize();
 
-        return $this->sendRequest($request_data);
+        return $this->sendRequest($this->request_data);
     }
 
     /**
-     * Get the associated Response
+     * Send the request with specified data
      *
+     * @param RequestDataInterface $request_data The request data to send (body of request)
+     * @throws RuntimeException On any RequestException of the http client
+     * @throws InvalidRequestException If one mandatory parameter is missing or invalid
+     * @throws InvalidResponseException If something is wrong with the response
      * @return ResponseInterface
+     */
+    abstract protected function sendRequest(RequestDataInterface $request_data);
+
+    /**
+     * @return Client
+     */
+    public function getHttpClient()
+    {
+        return $this->http_client;
+    }
+
+    /**
+     * @return RequestDataInterface
+     */
+    public function getRequestData()
+    {
+        return $this->request_data;
+    }
+
+    /**
+     * @return RequestAttributes
+     */
+    public function getRequestAttributes()
+    {
+        return $this->request_attributes;
+    }
+
+    /**
      * @throws RuntimeException
+     * @return ResponseInterface
      */
     public function getResponse()
     {

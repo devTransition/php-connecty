@@ -18,23 +18,28 @@ class RequestAttributes
     const METHOD_GET = 'GET';
     const METHOD_POST = 'POST';
     const METHOD_PUT = 'PUT';
+    const METHOD_PATCH = 'PATCH';
     const METHOD_DELETE = 'DELETE';
+    const METHOD_HEAD = 'HEAD';
+    const METHOD_OPTIONS = 'OPTIONS';
+    const METHOD_CONNECT = 'CONNECT';
+    const METHOD_TRACE = 'TRACE';
 
     /**
      * @var string
      */
-    public $method;
+    private $method;
 
     /**
      * Path part of url
      * @var string
      */
-    public $path;
+    private $path;
 
     /**
      * @var array
      */
-    public $options;
+    private $options;
 
     /**
      * Create a RequestParameters
@@ -54,10 +59,37 @@ class RequestAttributes
      * Function to add options to Request parameters
      *
      * @param array $options
+     * @return self
      */
     public function addOptions($options = [])
     {
         $this->options = array_merge($this->options, $options);
+        return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    /**
+     * Returns the options array for the http client
+     *
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
 }

@@ -18,4 +18,11 @@ interface ResponseInterface
      * @return RequestInterface
      */
     public function getRequest();
+
+    /**
+     * Get the response data
+     *
+     * @return mixed
+     */
+    public function getResponseData();
 }

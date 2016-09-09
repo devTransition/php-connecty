@@ -5,6 +5,10 @@
 
 namespace Connecty\Base\Message;
 
+use Connecty\Base\Model\RequestDataInterface;
+use Connecty\Exception\InvalidRequestException;
+use GuzzleHttp\Client;
+
 /**
  * Request Interface
  *
@@ -13,25 +17,19 @@ namespace Connecty\Base\Message;
 interface RequestInterface
 {
     /**
-     * Initialize request with parameters
-     *
-     * @param array $params The parameters to send
+     * @return Client
      */
-    public function initialize($params = []);
+    public function getHttpClient();
 
     /**
-     * Get all request parameters
-     *
-     * @return array
+     * @return RequestAttributes
      */
-    public function getParameters();
+    public function getRequestAttributes();
 
     /**
-     * Function to serialize the object to the HTTP request
-     *
-     * @return array
+     * @return RequestDataInterface
      */
-    public function serialize();
+    public function getRequestData();
 
     /**
      * Get the response to this request (if the request has been sent)
@@ -41,6 +39,13 @@ interface RequestInterface
     public function getResponse();
 
     /**
+     * Initialize request with parameters
+     *
+     * @param RequestDataInterface $params The parameters to send
+     */
+    public function initializeRequestData(RequestDataInterface $params);
+
+    /**
      * Send the request
      *
      * @return ResponseInterface
@@ -48,10 +53,12 @@ interface RequestInterface
     public function send();
 
     /**
-     * Send the request with specified data
+     * Validate the request
      *
-     * @param mixed $request_data The request data to send (body of request)
-     * @return ResponseInterface
+     * Override this method, it is called internally to avoid wasting time with an API call when the request is clearly invalid
+     *
+     * @throws InvalidRequestException If one mandatory parameter is missing or invalid
+     * @return true If everything is ok.
      */
-    public function sendRequest($request_data);
+    public function validate();
 }

@@ -2,14 +2,14 @@
 
 namespace Connecty;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\HandlerStack;
-use Psr\Log\LoggerInterface;
-use Connecty\Base\Storage\StorageInterface;
 use Connecty\Base\Helper;
 use Connecty\Base\Log\Logger;
-use Connecty\Base\Log\GuzzleLogger;
 use Connecty\Base\Storage\MemoryStorage;
+use Connecty\Base\Storage\StorageInterface;
+use GuzzleHttp\Client;
+use GuzzleHttp\Subscriber\Log\Formatter;
+use GuzzleHttp\Subscriber\Log\LogSubscriber;
+use Psr\Log\LoggerInterface;
 
 /**
  * The base Connecty class that defines constructor parameters for subclasses
@@ -23,30 +23,25 @@ class Connecty
     const PRODUCTION_MODE = 0;
     const TEST_MODE = 1;
     const SIMULATE_MODE = 2;
-
-    /**
-     * @var \GuzzleHttp\Client
-     */
-    protected $http_client;
-
-    /**
-     * Configuration
-     * @var array
-     */
-    protected $config;
-
     /**
      * Logger used for logging
      * @var \Psr\Log\LoggerInterface
      */
     public $logger;
-
     /**
      * Storage used to store authorization and caching
      * @var StorageInterface
      */
     public $storage;
-
+    /**
+     * @var \GuzzleHttp\Client
+     */
+    protected $http_client;
+    /**
+     * Configuration
+     * @var array
+     */
+    protected $config;
     /**
      * Test mode integer
      * @var int
@@ -61,14 +56,14 @@ class Connecty
      * @param LoggerInterface $logger - the logger that will be used for gateway
      * @param StorageInterface $storage - special cache for storing variables for gateway
      */
-    public function __construct($config = [], Client $http_client = null, LoggerInterface $logger = null, StorageInterface $storage = null)
+    public function __construct(array $config = [], Client $http_client = null, LoggerInterface $logger = null, StorageInterface $storage = null)
     {
         $this->config = $config;
 
-        $this->http_client = $http_client ?: $this->getDefaultHttpClient();
-
         // initialize default logger with logging disabled if not provided
-        $this->logger = $logger !== null ? $logger : new Logger(null, false);
+        $this->logger = $logger !== null ? $logger : new Logger();
+
+        $this->http_client = $http_client ?: $this->getDefaultHttpClient($this->logger);
 
         // initialize empty memory storage if storage is not provided
         $this->storage = $storage !== null ? $storage : new MemoryStorage();
@@ -79,6 +74,34 @@ class Connecty
         }
 
         Helper::initialize($this, $config);
+    }
+
+    /**
+     * Get the global default HTTP client
+     *
+     * @param LoggerInterface $logger - the logger that will be used for gateway
+     * @return Client
+     */
+    protected function getDefaultHttpClient(LoggerInterface $logger)
+    {
+        $options = [];
+
+        if (isset($this->config['base_url']) && strlen($this->config['base_url']) > 6) {
+            $options['base_url'] = $this->config['base_url'];
+        }
+
+        $client = new Client($options);
+
+        if (isset($this->config['debug']) && $this->config['debug'] === true) {
+            // Add HTTP-Requests to log
+            $options['debug'] = true;
+
+            // Attach the log channel to the log subscriber of the http client
+            $subscriber = new LogSubscriber($logger, Formatter::DEBUG);     // TODO r.simlinger: make log format changeable
+            $client->getEmitter()->attach($subscriber);
+        }
+
+        return $client;
     }
 
     /**
@@ -107,29 +130,10 @@ class Connecty
      * @param array $params
      * @return $this
      */
-    public function initialize($params = [])
+    public function initialize(array $params = [])
     {
         Helper::initialize($this, $params);
         return $this;
-    }
-
-    /**
-     * Get the global default HTTP client
-     *
-     * @return Client
-     */
-    protected function getDefaultHttpClient()
-    {
-        $stack = HandlerStack::create();
-        $options = ['handler' => $stack, 'auth' => null];
-
-        if (isset($this->config['debug']) && $this->config['debug'] === true) {
-            $options['debug'] = true;
-            // Add HTTP-Requests to log
-            $stack->push(new GuzzleLogger($this->logger));
-        }
-
-        return new Client($options);
     }
 
 }
