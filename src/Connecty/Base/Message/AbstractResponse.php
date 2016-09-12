@@ -5,6 +5,8 @@
 
 namespace Connecty\Base\Message;
 
+use Connecty\Base\Model\DataModelInterface;
+
 /**
  * Abstract Response
  *
@@ -22,48 +24,71 @@ namespace Connecty\Base\Message;
 abstract class AbstractResponse implements ResponseInterface
 {
     /**
-     * Request object for Response
+     * Holds the response data
      *
-     * @var RequestInterface
+     * @var DataModelInterface
      */
-    protected $request;
+    protected $data;
 
     /**
-     * The plain data contained in the response
+     * Holds the http status code
      *
-     * @var mixed
+     * @see https://de.wikipedia.org/wiki/HTTP-Statuscode
+     *
+     * @return int
      */
-    protected $response_data;
+    protected $status_code;
+
+    /**
+     * Holds the error messages that occurred by the request
+     *
+     * @var DataModelInterface
+     */
+    protected $errors;
 
     /**
      * Constructor
      *
-     * @param RequestInterface $request the initiating request
-     * @param mixed $response_data
+     * @param int $status_code
+     * @param DataModelInterface $data
+     * @param DataModelInterface $errors
      */
-    public function __construct(RequestInterface $request, $response_data)
+    public function __construct($status_code, DataModelInterface $data = null, DataModelInterface $errors = null)
     {
-        $this->request = $request;
-        $this->response_data = $response_data;
-    }
-
-    /**
-     * Get the initiating request object
-     *
-     * @return RequestInterface
-     */
-    public function getRequest()
-    {
-        return $this->request;
+        $this->status_code = (int)$status_code;
+        $this->data = $data;
+        $this->errors = $errors;
     }
 
     /**
      * Get the response data
      *
-     * @return mixed
+     * @return DataModelInterface
      */
-    public function getResponseData()
+    public function getData()
     {
-        return $this->response_data;
+        return $this->data;
+    }
+
+    /**
+     * Get the http status code
+     *
+     * @see https://de.wikipedia.org/wiki/HTTP-Statuscode
+     *
+     * @return int
+     */
+    public function getStatusCode()
+    {
+        return $this->status_code;
+    }
+
+    /**
+     * Get the error messages that occurred by the request
+     *
+     * @return DataModelInterface
+     */
+    public function getErrors()
+    {
+        return $this->errors;
     }
 }

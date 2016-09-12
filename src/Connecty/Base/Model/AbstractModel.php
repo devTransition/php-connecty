@@ -8,7 +8,7 @@ use Connecty\Exception\RuntimeException;
  * Class AbstractModel
  * @package ConnectyApiv2\Base\Model
  */
-abstract class AbstractModel implements RequestDataInterface
+abstract class AbstractModel implements DataModelInterface
 {
     /**
      * Convert the given array into object models

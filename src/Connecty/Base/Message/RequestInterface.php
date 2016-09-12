@@ -5,7 +5,7 @@
 
 namespace Connecty\Base\Message;
 
-use Connecty\Base\Model\RequestDataInterface;
+use Connecty\Base\Model\DataModelInterface;
 use Connecty\Exception\InvalidRequestException;
 use GuzzleHttp\Client;
 
@@ -27,7 +27,7 @@ interface RequestInterface
     public function getRequestAttributes();
 
     /**
-     * @return RequestDataInterface
+     * @return DataModelInterface
      */
     public function getRequestData();
 
@@ -41,9 +41,9 @@ interface RequestInterface
     /**
      * Initialize request with parameters
      *
-     * @param RequestDataInterface $params The parameters to send
+     * @param DataModelInterface $params The parameters to send
      */
-    public function initializeRequestData(RequestDataInterface $params);
+    public function initialize(DataModelInterface $params);
 
     /**
      * Send the request

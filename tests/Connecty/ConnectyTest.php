@@ -8,7 +8,7 @@ namespace Connecty;
 use Connecty\Base\Message\AbstractRequest;
 use Connecty\Base\Message\RequestAttributes;
 use Connecty\Base\Model\AbstractModel;
-use Connecty\Base\Model\RequestDataInterface;
+use Connecty\Base\Model\DataModelInterface;
 use Connecty\Base\Storage\StorageInterface;
 use Mockery as m;
 use Psr\Log\LoggerInterface;
@@ -81,7 +81,7 @@ class ConnectyTest extends \PHPUnit_Framework_TestCase
         $this->connecty = new ConnectyTest_MockConnecty;
         $params = ConnecyTest_MockAbstractModel::createFromArray([]);
         $request = $this->connecty->callCreateSampleRequest($params);
-        $this->assertNotNull($request->serialize());
+        $this->assertNotNull($request->getRequestData());
     }
 
 }
@@ -110,8 +110,13 @@ class ConnecyTest_MockAbstractRequest extends AbstractRequest
         $this->request_attributes = new RequestAttributes();
     }
 
-    public function sendRequest(RequestDataInterface $request_data)
+    public function sendRequest(DataModelInterface $request_data)
     {
+    }
+
+    public function validate()
+    {
+        return true;
     }
 }
 

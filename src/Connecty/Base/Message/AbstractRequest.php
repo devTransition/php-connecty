@@ -5,7 +5,7 @@
 
 namespace Connecty\Base\Message;
 
-use Connecty\Base\Model\RequestDataInterface;
+use Connecty\Base\Model\DataModelInterface;
 use Connecty\Exception\InvalidRequestException;
 use Connecty\Exception\InvalidResponseException;
 use Connecty\Exception\RuntimeException;
@@ -64,7 +64,7 @@ abstract class AbstractRequest implements RequestInterface
     protected $http_client;
 
     /**
-     * @var RequestDataInterface
+     * @var DataModelInterface
      */
     protected $request_data;
 
@@ -86,17 +86,17 @@ abstract class AbstractRequest implements RequestInterface
      * Create a new Request
      *
      * @param Client $http_client A Guzzle client to make API calls with
-     * @param RequestDataInterface $request_data
+     * @param DataModelInterface $request_data
      * @param RequestAttributes $request_attributes
      */
-    public function __construct(Client $http_client, RequestDataInterface $request_data = null, RequestAttributes $request_attributes = null)
+    public function __construct(Client $http_client, DataModelInterface $request_data = null, RequestAttributes $request_attributes = null)
     {
         // set up the http client
         $this->http_client = $http_client;
 
         // set up the (early binding of the) request data
         if ($request_data) {
-            $this->initializeRequestData($request_data);
+            $this->initialize($request_data);
         }
 
         // set up the (optional) given and the default request attributes
@@ -126,11 +126,11 @@ abstract class AbstractRequest implements RequestInterface
      *
      * If any unknown parameters passed, they will be ignored.
      *
-     * @param RequestDataInterface $request_data An associative array of parameters
+     * @param DataModelInterface $request_data An associative array of parameters
      * @throws RuntimeException
      * @return static
      */
-    public function initializeRequestData(RequestDataInterface $request_data)
+    public function initialize(DataModelInterface $request_data)
     {
         if ($this->response) {
             throw new RuntimeException('Request cannot be modified after it has been sent');
@@ -169,13 +169,13 @@ abstract class AbstractRequest implements RequestInterface
     /**
      * Send the request with specified data
      *
-     * @param RequestDataInterface $request_data The request data to send (body of request)
+     * @param DataModelInterface $request_data The request data to send (body of request)
      * @throws RuntimeException On any RequestException of the http client
      * @throws InvalidRequestException If one mandatory parameter is missing or invalid
      * @throws InvalidResponseException If something is wrong with the response
      * @return ResponseInterface
      */
-    abstract protected function sendRequest(RequestDataInterface $request_data);
+    abstract protected function sendRequest(DataModelInterface $request_data);
 
     /**
      * @return Client
@@ -186,7 +186,7 @@ abstract class AbstractRequest implements RequestInterface
     }
 
     /**
-     * @return RequestDataInterface
+     * @return DataModelInterface
      */
     public function getRequestData()
     {

@@ -6,7 +6,7 @@
 namespace Connecty\Base\Message;
 
 use Connecty\Base\Model\AbstractModel;
-use Connecty\Base\Model\RequestDataInterface;
+use Connecty\Base\Model\DataModelInterface;
 use Mockery as m;
 use Guzzlehttp\Client as Client;
 
@@ -34,16 +34,10 @@ class AbstractRequestTest extends \PHPUnit_Framework_TestCase
         return $this->http_client;
     }
 
-    public function testConstruct()
-    {
-        $this->request = new AbstractRequestTest_MockAbstractRequest($this->getHttpClient(), null);
-        $this->assertSame(['amount', 'currency'], $this->request->getParameters());
-    }
-
     public function testInitializeWithParams()
     {
         $this->assertSame($this->request, $this->request->initialize(AbstractRequestTest_MockAbstractModel::createFromArray(['amount' => '1.23'])));
-        $this->assertSame('1.23', $this->request->);
+        $this->assertSame('1.23', $this->request->getRequestData()->getAmount());
     }
 
     /**
@@ -59,47 +53,20 @@ class AbstractRequestTest extends \PHPUnit_Framework_TestCase
         $this->request->initialize(AbstractRequestTest_MockAbstractModel::createFromArray(['amount' => 99, 'currency' => 'EUR']));
     }
 
-    public function testAmount()        // TODO this test validate only php-functionality
-    {
-        $this->request->amount = '1.00';
-        $this->assertSame('1.00', $this->request->amount);
-    }
-
-    public function testCurrency()      // TODO this test validate only php-functionality
-    {
-        $this->request->currency = 'EUR';
-        $this->assertSame('EUR', $this->request->currency);
-    }
-
-    public function testGetParameters()
-    {
-        $expected = ['amount', 'currency',];
-        $this->assertEquals($expected, $this->request->getParameters());
-    }
-
-    public function testSerialize()
-    {
-        $this->request->currency = 'EUR';
-        $this->request->amount = 'asdf';
-        $expected = ['currency' => 'EUR', 'amount' => 'asdf',];
-        $this->assertEquals($expected, $this->request->serialize());
-    }
-
     public function testCanValidateExistingParameters()
     {
         $this->assertFalse($this->request->validate());
     }
 
     /**
-     * @expectedException \Connecty\Exception\InvalidArgumentException
+     * @expectedException \Connecty\Exception\RuntimeException
      * @expectedExceptionMessage Request Mockery_0_Connecty_Base_Message_AbstractRequestTest_MockAbstractRequest is not valid
      */
     public function testSend()
     {
         $response = m::mock('\Connecty\Base\Message\ResponseInterface');
         $data = ['request data'];
-        $this->request->shouldReceive('serialize')->once()->andReturn($data);
-        $this->request->shouldReceive('sendRequest')->once()->with($data)->andReturn($response);
+        $this->request->shouldReceive('send')->once()->with($data)->andReturn($response);
         $this->assertSame($response, $this->request->send());
     }
 
@@ -149,7 +116,7 @@ class AbstractRequestTest_MockAbstractRequest extends AbstractRequest
         $this->request_attributes = new RequestAttributes();
     }
 
-    public function sendRequest(RequestDataInterface $request_data)
+    public function sendRequest(DataModelInterface $request_data)
     {
         $this->response = m::mock('\Connecty\Base\Message\AbstractResponse');
     }

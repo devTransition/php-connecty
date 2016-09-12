@@ -22,16 +22,13 @@ class AbstractResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testConstruct()
     {
-        $data = ['foo' => 'bar'];
-        $request = m::mock('\Connecty\Base\Message\RequestInterface');
-        $this->response = m::mock('\Connecty\Base\Message\AbstractResponse', [$request, $data])->makePartial();
-        $this->assertSame($request, $this->response->getRequest());
-        $this->assertSame($data, $this->response->getResponseData());
+        // TODO implement
     }
 
     public function testDefaultMethods()
     {
-        $this->assertNull($this->response->getRequest());
-        $this->assertNull($this->response->getResponseData());
+        $this->assertNull($this->response->getData());
+        $this->assertNull($this->response->getErrors());
+        $this->assertNull($this->response->getStatusCode());
     }
 }

@@ -5,9 +5,9 @@ namespace Connecty\Base\Model;
 use Connecty\Exception\RuntimeException;
 
 /**
- * Interface RequestDataInterface
+ * Interface DataModelInterface
  */
-interface RequestDataInterface
+interface DataModelInterface
 {
     /**
      * Convert the given array into object models
