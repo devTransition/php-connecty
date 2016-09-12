@@ -6,6 +6,7 @@
 namespace Connecty\Base\Message;
 
 use Connecty\Base\Model\DataModelInterface;
+use Connecty\Exception\InvalidResponseException;
 
 /**
  * Abstract Response
@@ -91,4 +92,12 @@ abstract class AbstractResponse implements ResponseInterface
     {
         return $this->errors;
     }
+
+    /**
+     * Validate the response data (check status code, check for existing error messages in the response, ...)
+     *
+     * @throws InvalidResponseException If something is wrong with the response
+     * @return static
+     */
+    abstract public function validate();
 }

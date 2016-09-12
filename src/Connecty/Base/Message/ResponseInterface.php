@@ -4,7 +4,9 @@
  */
 
 namespace Connecty\Base\Message;
+
 use Connecty\Base\Model\DataModelInterface;
+use Connecty\Exception\InvalidResponseException;
 
 /**
  * Response Interface
@@ -35,4 +37,12 @@ interface ResponseInterface
      * @return DataModelInterface
      */
     public function getErrors();
+
+    /**
+     * Validate the response data (check status code, check for existing error messages in the response, ...)
+     *
+     * @throws InvalidResponseException If something is wrong with the response
+     * @return static
+     */
+    public function validate();
 }
